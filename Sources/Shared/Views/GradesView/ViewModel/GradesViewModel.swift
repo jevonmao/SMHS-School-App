@@ -121,6 +121,23 @@ extension GradesViewModel {
 }
 //MARK: - Login & Logout methods
 extension GradesViewModel {
+    func reloadData() {
+        #if DEBUG
+        loginAndFetch()
+        #else
+        if let time = lastReloadTime {
+            if abs(Date().timeIntervalSince(time)) > TimeInterval(60 * 10) {
+                loginAndFetch()
+                lastReloadTime = Date()
+            }
+        }
+        else {
+            lastReloadTime = Date()
+            loginAndFetch()
+        }
+        #endif
+    }
+    
     func loginAndFetch() {
         registerAnalyticEvent()
         guard !email.isEmpty && !password.isEmpty else {
