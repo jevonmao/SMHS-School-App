@@ -77,4 +77,29 @@ struct GradesNetworkModel {
             }
             .eraseToAnyPublisher()
     }
+
+//    func getLoginAndFetchRequest(email: String,
+//                                 password: String,
+//                                 debugMode: Bool) ->  {
+//        let loginEndpoint = Endpoint.studentLogin(email: email,
+//                                             password: password,
+//                                             debugMode: debugMode)
+//        let getSummaryEndpoint = Endpoint.getGradesSummary()
+//        let summarySupplementEndpoint = Endpoint.getGradesSummarySupplement()
+//
+//        let getSummarySupplementPublisher = fetch(with: summarySupplementEndpoint.request,
+//                                                                     type: [GradesSupplementSummary].self)
+//
+//        return fetch(with: loginEndpoint.request)
+//            .flatMap {[unowned self] _ in
+//                fetch(with: getSummaryEndpoint.request,
+//                                              type: CourseGrade.self)
+//                    .combineLatest(getSummarySupplementPublisher)
+//                    .eraseToAnyPublisher()
+//
+//            }
+//            .retry(2)
+//            .receive(on: RunLoop.main)
+//            .eraseToAnyPublisher()
+//    }
 }

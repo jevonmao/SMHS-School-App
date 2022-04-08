@@ -58,24 +58,6 @@ final class SharedScheduleInformation: ObservableObject {
             shouldPurge {
             reset()
         }
-    } 
-    
-    func reloadData() {
-        if let time = lastReloadTime {
-            // minimum reload interval is 6 hours
-            if abs(Date().timeIntervalSince(time)) > TimeInterval(21600) {
-                print("Reload valid, fetching data")
-                fetchData()
-                lastReloadTime = Date()
-            }
-            print("Reload invalid")
-        }
-        else {
-            print("Reload 1st time, fetching data")
-            lastReloadTime = Date()
-            fetchData()
-        }
-        
     }
 
     func fetchData(completion: ((Bool) -> Void)? = nil) {

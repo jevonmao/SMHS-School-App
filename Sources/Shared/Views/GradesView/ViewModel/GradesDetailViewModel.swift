@@ -13,6 +13,7 @@ import SwiftUI
 class GradesDetailViewModel: ObservableObject {
     @Published var detailedAssignments = [GradesDetail.Assignment]()
     @Published var isEditModeOn = false
+
     var overallPercent: Double {
         let userDefault = UserDefaults.standard
         let key = "rubric\(self.gradebookNumber)"
@@ -79,13 +80,40 @@ class GradesDetailViewModel: ObservableObject {
             .publishDecodable(type: GradesDetail.self)
             .value()
             .receive(on: RunLoop.main)
-            .sink(receiveCompletion: {requestError in
+            .retry(2)
+            .sink(receiveCompletion: {[unowned self] requestError in
                 switch requestError {
                 case .finished:
                     return
                 case .failure(let error):
                     #if DEBUG
                     print(error)
+                    if error.isResponseSerializationError {
+                        guard let email = KeychainWrapper.standard.string(forKey: "email"),
+                              let password = KeychainWrapper.standard.string(forKey: "password")
+                        else {
+                            preconditionFailure("Keychain value for email or password not found.")
+                        }
+                        let loginEndpoint = Endpoint.studentLogin(email: email,
+                                                             password: password)
+                        let getSummaryEndpoint = Endpoint.getGradesSummary()
+                        let summarySupplementEndpoint = Endpoint.getGradesSummarySupplement()
+
+                        let getSummarySupplementPublisher = self.networkingModel.fetch(with: summarySupplementEndpoint.request,
+                                                                                     type: [GradesSupplementSummary].self)
+                        self.networkingModel.fetch(with: loginEndpoint.request)
+                            .flatMap {[unowned self] _ in
+                                self.networkingModel.fetch(with: getSummaryEndpoint.request,
+                                                              type: CourseGrade.self)
+                                    .combineLatest(getSummarySupplementPublisher)
+
+                            }
+                            .retry(2)
+                            .receive(on: RunLoop.main)
+                            .sink(receiveCompletion: {_ in
+
+                            }) {_, _ in}
+                    }
                     #endif
                 }
             }, receiveValue: {[unowned self] receivedGradesDetail in
@@ -104,7 +132,7 @@ class GradesDetailViewModel: ObservableObject {
             .publishDecodable(type: GradesRubric.self)
             .value()
             .receive(on: RunLoop.main)
-            .retry(3)
+            .retry(2)
             .sink(receiveCompletion: {requestError in
                 switch requestError {
                 case .finished:

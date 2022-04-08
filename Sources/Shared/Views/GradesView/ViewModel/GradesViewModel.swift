@@ -14,9 +14,7 @@ import Alamofire
 
 final class GradesViewModel: ObservableObject {
     //Networking manager, contains actual HTTPS request methods
-    var gradesNetworkModel = GradesNetworkModel()
-    @Storage(key: "lastReloadTime", defaultValue: nil) private var lastReloadTime: Date?
-    
+    var gradesNetworkModel = GradesNetworkModel()    
     //Logout
     @Published var showLogoutAlert = false
     
@@ -41,7 +39,7 @@ final class GradesViewModel: ObservableObject {
     
     //Whether isLoading to determine showing loading animation
     @Published var isLoading = false
-    @Published var userInitiatedLogin = false
+    @Published var userInitiatedLogin = true
     
     @Published var userSettings: UserSettings?
     private var anyCancellables: Set<AnyCancellable> = []
@@ -123,24 +121,6 @@ extension GradesViewModel {
 }
 //MARK: - Login & Logout methods
 extension GradesViewModel {
-    
-    func reloadData() {
-        #if DEBUG
-        loginAndFetch()
-        #else
-        if let time = lastReloadTime {
-            if abs(Date().timeIntervalSince(time)) > TimeInterval(60 * 10) {
-                loginAndFetch()
-                lastReloadTime = Date()
-            }
-        }
-        else {
-            lastReloadTime = Date()
-            loginAndFetch()
-        }
-        #endif
-    }
-    
     func loginAndFetch() {
         registerAnalyticEvent()
         guard !email.isEmpty && !password.isEmpty else {
@@ -218,8 +198,4 @@ extension GradesViewModel {
         password = ""
         gradesResponse = []
     }
-}
-
-extension GradesViewModel {
-    
 }

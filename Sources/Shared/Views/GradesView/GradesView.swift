@@ -38,18 +38,22 @@ struct GradesView: View {
                     .padding(.vertical)
                 }
                 .navigationBarTitle("Grades")
-                .loadingAnimatable(reload: gradesViewModel.reloadData,
-                                   isLoading: $gradesViewModel.isLoading,
-                                   shouldReload: !$gradesViewModel.userInitiatedLogin)
+                .loadingAnimatable(reload: {
+                    if !gradesViewModel.userInitiatedLogin {
+                        DispatchQueue.runTask(gradesViewModel.loginAndFetch,
+                                              name: "loginAndFetchGrades",
+                                              every: TimeInterval(3600)) // 1 hour
+                    }
+                },
+                                   isLoading: $gradesViewModel.isLoading)
                 .onDisappear {gradesViewModel.userInitiatedLogin = false}
                 
             }
             else {
                 GradesLoginView(gradesViewModel: gradesViewModel)
                     .navigationBarTitle("Grades")
-                    .loadingAnimatable(reload: gradesViewModel.reloadData,
-                                       isLoading: $gradesViewModel.isLoading,
-                                       shouldReload: .constant(false))
+                    .loadingAnimatable(reload: {},
+                                       isLoading: $gradesViewModel.isLoading)
             }
         }
         .navigationViewStyle(StackNavigationViewStyle())
