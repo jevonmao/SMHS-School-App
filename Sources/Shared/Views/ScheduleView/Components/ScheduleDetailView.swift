@@ -119,10 +119,6 @@ struct ScheduleDetailView: View {
                             .padding(.bottom, 1)
                         PeriodBlockItem(block: period8)
                     }
-                    if let atheleticsInfo = scheduleDay?.atheleticsInfo {
-                        Text(atheleticsInfo)
-                    }
-
                 }
                 .padding(.horizontal, horizontalPadding ? 16 : 0)
             }

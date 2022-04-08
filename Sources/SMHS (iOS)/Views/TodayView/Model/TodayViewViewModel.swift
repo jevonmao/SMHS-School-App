@@ -49,12 +49,6 @@ class TodayViewViewModel: ObservableObject {
     init (mockDate: Date? = nil) {
         self.mockDate = mockDate
         fetchAnnoucements()
-        $selectionMode
-            .sink {_ in
-                var hapticsManager = HapticsManager(impactStyle: .soft)
-                hapticsManager.UIFeedbackImpact()
-            }
-            .store(in: &anyCancellable)
     }
 
     func updateAnnoucements() {

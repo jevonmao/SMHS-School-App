@@ -11,11 +11,7 @@ struct AnnoucementBanner: View {
     @StateObject var viewModel: TodayViewViewModel
 
     var body: some View {
-        Button(action: {
-            var haptics = HapticsManager(impactStyle: .light)
-            viewModel.showAnnoucement = viewModel.isAnnoucementAvailable
-            haptics.notificationImpact(.error)
-        }, label: {
+        Button(action: {viewModel.showAnnoucement = true}, label: {
             VStack {
                 HStack(alignment: .top) {
                         Label("Daily Announcement", systemSymbol: .megaphoneFill)
@@ -25,7 +21,6 @@ struct AnnoucementBanner: View {
 
                         Image(systemSymbol: .chevronRight)
                             .padding(.top, 2)
-                            .foregroundColor(.platformSecondaryBackground)
 
                 }
 
@@ -34,16 +29,16 @@ struct AnnoucementBanner: View {
                 }
                 else {
                     if viewModel.isAnnoucementAvailable {
-                        Text("✅ Last Updated: \(viewModel.lastUpdateDisplay)")
+                        Text("Last Updated: \(viewModel.lastUpdateDisplay)")
                         .font(.caption)
-                        .foregroundColor(.platformSecondaryBackground)
+                        .foregroundColor(.secondaryLabel)
                         .padding(.top, 2)
                     }
                     else {
                         Label(
                             title: { Text("Unavailable at this time.")
                                 .font(Font.footnote.weight(.medium))
-                                .foregroundColor(.platformSecondaryBackground)
+                                .foregroundColor(.secondaryLabel)
                             },
                             icon: { Image(systemSymbol: .exclamationmarkTriangleFill)
                                 .foregroundColor(.systemYellow)
@@ -56,9 +51,10 @@ struct AnnoucementBanner: View {
 
             }
             .padding(12)
-            .foregroundColor(Color.platformBackground)
-            .background(appPrimary)
+            .foregroundColor(appPrimary)
+            .background(Color.platformBackground)
             .roundedCorners(cornerRadius: 10)
+            .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
             .padding(.vertical)
         })
     }

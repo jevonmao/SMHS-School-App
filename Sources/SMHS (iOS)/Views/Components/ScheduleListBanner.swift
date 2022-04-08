@@ -14,36 +14,34 @@ struct ScheduleListBanner: View {
     var action: () -> ()
     var geometryProxy: GeometryProxy
     var body: some View {
-        VStack {
             VStack {
-                Button(action: action) {
-                    Text("Master Calendar")
-                        .font(.body)
-                        .fontWeight(.semibold)
+                VStack {
+                    Button(action: action) {
+                        Text("Master Calendar")
+                            .font(.body)
+                            .fontWeight(.semibold)
+                            .textCase(nil)
+                            .padding(EdgeInsets(top: 10, leading: 30, bottom: 10, trailing: 30))
+                    }
+                    .background(Color.platformBackground)
+                    .foregroundColor(appPrimary)
+                    .clipShape(Capsule(style: .continuous))
+                    Text("View calendar for all school events.")
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .foregroundColor(.white)
                         .textCase(nil)
-                        .padding(EdgeInsets(top: 10, leading: 30, bottom: 10, trailing: 30))
                 }
-                .background(Color.platformBackground)
-                .foregroundColor(appPrimary)
-                .clipShape(Capsule(style: .continuous))
-                Text("View calendar for all school events.")
-                    .font(.caption)
-                    .fontWeight(.medium)
-                    .foregroundColor(.white)
-                    .textCase(nil)
+                .padding(EdgeInsets(top: 30, leading: 15, bottom: 30, trailing: 15))
             }
-            .padding(EdgeInsets(top: 20, leading: 15, bottom: 20, trailing: 15))
-        }
-                          // 20 padding on each side
-        .frame(width: geometryProxy.size.width - 40)
-        //.fixedSize(horizontal: true, vertical: true)
-        .background(appPrimary)
-        .scaleEffect(x: 1, y: animate ? 1 : 0, anchor: .top)
-        .animation(Animation.easeInOut)
-        .onAppear {animate = true}
-        .onDisappear {animate = false}
-        .padding(.vertical, -5)
-        .roundedCorners(cornerRadius: 10)
+            .frame(width: geometryProxy.size.width)
+            .fixedSize(horizontal: true, vertical: true)
+            .background(appPrimary)
+            .scaleEffect(x: 1, y: animate ? 1 : 0, anchor: .top)
+            .animation(Animation.easeInOut)
+            .onAppear {animate = true}
+            .onDisappear {animate = false}
+            .padding(.vertical, -5)
     }
 }
 

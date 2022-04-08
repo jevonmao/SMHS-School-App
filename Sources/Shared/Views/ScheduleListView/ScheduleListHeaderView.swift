@@ -25,7 +25,8 @@ struct ScheduleListHeaderView: View {
             .foregroundColor(appPrimary)
             Spacer()
         }
-        
+        .padding(.top, 10)
+        .padding(.bottom, 3)
     }
 }
 
