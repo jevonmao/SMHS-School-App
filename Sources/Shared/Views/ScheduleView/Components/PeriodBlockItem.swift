@@ -12,7 +12,7 @@ struct PeriodBlockItem: View {
     var block: ClassPeriod
     var scheduleTitle: String?
     var twoLine: Bool = false
-
+    var isBlurred = true
     var displayedTitle: String {
         if let title = scheduleTitle {
             return title
@@ -32,42 +32,67 @@ struct PeriodBlockItem: View {
     }
 
     var body: some View {
-        VStack(spacing: 5) {
+        VStack {
             VStack {
-                if twoLine {
-                    doubleLineView
+                Group {
+                    if twoLine {
+                        doubleLineView
+                    }
+                    else {
+                        singleLineView
+                            .padding(.bottom, 4)
+                    }
                 }
-                else {
-                    singleLineView
-                        .padding(.bottom, 8)
-                }
+                .vibrancyEffectStyle(.tertiaryLabel)
+
                 Spacer()
 
                 if let className = className {
                     Text(className)
                         .fontWeight(.semibold)
                         .textAlign(.leading)
-                        .font(.title3)
+                        .font(.headline)
+                        .if(isBlurred) {
+                            $0.vibrancyEffectStyle(.label)
+                        }
+
+
                     Text(displayedTitle)
                         .font(.subheadline)
                         .textAlign(.leading)
                         .foregroundColor(.platformSecondaryBackground)
+                        .if(isBlurred) {
+                            $0.vibrancyEffectStyle(.tertiaryLabel)
+                        }
                 }
                 else {
                     Text(displayedTitle)
                         .fontWeight(.medium)
                         .textAlign(.leading)
-                        .font(.title3)
+                        .font(.headline)
+                        .if(isBlurred) {
+                            $0.vibrancyEffectStyle(.label)
+                        }
                 }
             }
             .padding(.horizontal)
-            .padding(.vertical, 5)
-            .foregroundColor(.platformTertiaryBackground)
-            
+            .padding(.vertical, 4)
+            .if(!isBlurred) {
+                $0.foregroundColor(.platformTertiaryBackground)
+            }
+
         }
         .frame(maxWidth: .infinity)
-        .background(Color.appPrimary)
-        .roundedCorners(cornerRadius: 12)
+        .if(isBlurred, transform: {
+            $0
+                .vibrancyEffect()
+                .availableBackgroundBlur(isBlurred: isBlurred)
+        }, elseThen: {
+            $0
+                .background(Color.appPrimary)
+        })
+
+        .roundedCorners(cornerRadius: 10)
         .padding(.vertical, 5)
     }
     
@@ -84,20 +109,33 @@ struct PeriodBlockItem: View {
         .lineLimit(1)
         .minimumScaleFactor(0.5)
     }
-    
+
     var singleLineView: some View {
         GeometryReader {geo in
             HStack {
                 HStack {
                     Text("START:")
-                        .opacity(0.5)
+                        .if(isBlurred, transform: {
+                            $0
+                                .vibrancyEffectStyle(.quaternaryLabel)
+                        }, elseThen: {
+                            $0
+                                .opacity(0.5)
+                        })
+
 
                     Text(formatDate(block.startTime))
                 }
                 .frame(width: geo.size.width/CGFloat(2), alignment: .leading)
                 HStack {
                     Text("END:")
-                        .opacity(0.5)
+                        .if(isBlurred, transform: {
+                            $0
+                                .vibrancyEffectStyle(.quaternaryLabel)
+                        }, elseThen: {
+                            $0
+                                .opacity(0.5)
+                        })
 
                     Text(formatDate(block.endTime))
                 }
@@ -127,3 +165,51 @@ struct PeriodBlockItem: View {
     }
 }
 
+fileprivate extension View {
+
+    @ViewBuilder
+    func availableBackgroundBlur(isBlurred: Bool = true) -> some View {
+        if isBlurred {
+            if #available(iOS 15, *) {
+                self.background(.regularMaterial)
+            }
+            else {
+                self
+                    .background(
+                        Color.clear
+                        .blurEffect()
+                        .blurEffectStyle(.regular)
+                    )
+
+            }
+        }
+        else {
+            self.background(Color.appPrimary)
+        }
+
+    }
+
+    @ViewBuilder
+    func availablePrimaryVibrancy() -> some View {
+        if #available(iOS 15, *) {
+            self.foregroundColor(.secondary)
+        }
+        else {
+            self
+            .vibrancyEffect()
+            .vibrancyEffectStyle(.secondaryLabel)
+        }
+    }
+
+    @ViewBuilder
+    func availableSecondaryVibrancy() -> some View {
+        if #available(iOS 15, *) {
+            self.foregroundColor(.secondaryLabel)
+        }
+        else {
+            self
+            .vibrancyEffect()
+            .vibrancyEffectStyle(.tertiaryLabel)
+        }
+    }
+}
